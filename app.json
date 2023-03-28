@@ -1,0 +1,10 @@
+{
+  "name": "discordChatGPT",
+  "description": "use ChatGPT from Discord",
+  "repository": "",
+  "keywords": [
+    "python",
+    "discord",
+    "bot"
+  ]
+}

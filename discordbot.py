@@ -64,7 +64,7 @@ async def on_message(discord_message):
         is_waiting_personality_text = False
         await discord_message.channel.send("人格を変更しました。")
         return
-    if discord_message.content == "!init_debug":
+    if discord_message.content == "!init":
         await discord_message.channel.send("このチャンネルをAIとの会話に使用します。")
         database.regist_reply_channel_id(channel_id)
         return

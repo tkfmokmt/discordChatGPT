@@ -82,7 +82,7 @@ async def on_message(discord_message):
         is_waiting_personality_text = True
         waiting_channel_id = channel_id
         await discord_message.channel.send(
-            """このチャンネルの回答の人格を変更します。人格を説明する文章をこのメッセージの直後に入力してください。"""
+            """このチャンネルの回答の人格を変更します。\r\n人格を説明する文章をこのメッセージの直後に入力してください。"""
         )
         return
     if discord_message.content == "!pause":

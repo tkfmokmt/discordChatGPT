@@ -61,7 +61,7 @@ async def on_message(discord_message):
     channel_id: str = str(discord_message.channel.id)
     if discord_message.author.bot:
         return
-    if discord_message.content == "!init_debug":
+    if discord_message.content == "!init":
         await discord_message.channel.send("このチャンネルをAIとの会話に使用します。")
         database.regist_reply_channel_id(channel_id)
         return

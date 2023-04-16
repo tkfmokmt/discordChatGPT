@@ -49,37 +49,50 @@ async def on_ready():
 
 
 is_waiting_personality_text: bool = False
-temp_channel_id: str = ""
+waiting_channel_id: str = ""
+is_pausing: bool = False
 
 
 @client.event
 async def on_message(discord_message):
     global is_waiting_personality_text
-    global temp_channel_id
+    global waiting_channel_id
+    global is_pausing
     channel_id: str = str(discord_message.channel.id)
     if discord_message.author.bot:
         return
-    if is_waiting_personality_text and temp_channel_id == channel_id:
+    if discord_message.content == "!init_debug":
+        await discord_message.channel.send("このチャンネルをAIとの会話に使用します。")
+        database.regist_reply_channel_id(channel_id)
+        return
+    if not database.is_reply_channel_id(channel_id):
+        return
+    if discord_message.content == "!resume":
+        is_pausing = False
+        await discord_message.channel.send("応答を再開します。")
+        return
+    if is_pausing:
+        return
+    if is_waiting_personality_text and waiting_channel_id == channel_id:
         database.regist_personality(channel_id, discord_message.content)
         is_waiting_personality_text = False
         await discord_message.channel.send("人格を変更しました。")
         return
-    if discord_message.content == "!init":
-        await discord_message.channel.send("このチャンネルをAIとの会話に使用します。")
-        database.regist_reply_channel_id(channel_id)
-        return
     if discord_message.content == "!act":
         is_waiting_personality_text = True
-        temp_channel_id = channel_id
+        waiting_channel_id = channel_id
         await discord_message.channel.send(
             """このチャンネルの回答の人格を変更します。人格を説明する文章をこのメッセージの直後に入力してください。"""
         )
         return
-    if database.is_reply_channel_id(channel_id):
-        await discord_message.channel.send(
-            await exec_non_asyc_func(create_compilation, discord_message)
-        )
+    if discord_message.content == "!pause":
+        is_pausing = True
+        await discord_message.channel.send("応答を停止します。")
         return
+    await discord_message.channel.send(
+        await exec_non_asyc_func(create_compilation, discord_message)
+    )
+    return
 
 
 client.run(config.DISCORD_BOT_TOKEN)

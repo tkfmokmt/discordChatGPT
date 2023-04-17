@@ -9,7 +9,7 @@ role varchar(100),
 content text
 );
 
-create table IF NOT EXISTS ai_personality (
+create table IF NOT EXISTS ai_personalitys (
 channel_id varchar(100) PRIMARY KEY,
 personality_text text
 );

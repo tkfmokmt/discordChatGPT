@@ -24,6 +24,18 @@ def regist_reply_channel_id(channel_id: str):
             conn.commit()
 
 
+def delete_reply_channel_id(channel_id: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM reply_channel_ids WHERE channel_id = %s",
+                (channel_id,),
+            )
+            conn.commit()
+    delete_chat_history(channel_id)
+    delete_ai_personality(channel_id)
+
+
 def is_reply_channel_id(channel_id: str) -> bool:
     with get_connection() as conn:
         with conn.cursor() as cur:
@@ -74,7 +86,7 @@ def fetch_chat_history_top10(channel_id: str) -> List[Dict]:
             return retList
 
 
-def clear_chat_history(channel_id: str):
+def delete_chat_history(channel_id: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -84,11 +96,11 @@ def clear_chat_history(channel_id: str):
             conn.commit()
 
 
-def regist_personality(channel_id: str, personality_text: str):
+def regist_ai_personality(channel_id: str, personality_text: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO ai_personality(channel_id, personality_text) VALUES(%s, %s) ON CONFLICT(channel_id) DO UPDATE SET personality_text = %s",
+                "INSERT INTO ai_personalitys(channel_id, personality_text) VALUES(%s, %s) ON CONFLICT(channel_id) DO UPDATE SET personality_text = %s",
                 (
                     channel_id,
                     personality_text,
@@ -97,14 +109,24 @@ def regist_personality(channel_id: str, personality_text: str):
             )
             conn.commit()
     # それまでの会話履歴が新しい人格の回答に影響するため
-    clear_chat_history(channel_id)
+    delete_chat_history(channel_id)
+
+
+def delete_ai_personality(channel_id: str):
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM ai_personalitys WHERE channel_id = %s",
+                (channel_id,),
+            )
+            conn.commit()
 
 
 def fetch_personality(channel_id: str):
     with get_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
             cur.execute(
-                "SELECT personality_text FROM ai_personality WHERE channel_id = %s",
+                "SELECT personality_text FROM ai_personalitys WHERE channel_id = %s",
                 (channel_id,),
             )
             result = cur.fetchall()

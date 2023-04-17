@@ -61,9 +61,13 @@ async def on_message(discord_message):
     channel_id: str = str(discord_message.channel.id)
     if discord_message.author.bot:
         return
-    if discord_message.content == "!init":
-        await discord_message.channel.send("このチャンネルをAIとの会話に使用します。")
+    if discord_message.content == "!start":
         database.regist_reply_channel_id(channel_id)
+        await discord_message.channel.send("このチャンネルをAIとの会話に使用します。")
+        return
+    if discord_message.content == "!stop":
+        database.delete_reply_channel_id(channel_id)
+        await discord_message.channel.send("このチャンネルでのAIとの会話を終了しました。")
         return
     if not database.is_reply_channel_id(channel_id):
         return
@@ -74,7 +78,7 @@ async def on_message(discord_message):
     if is_pausing:
         return
     if is_waiting_personality_text and waiting_channel_id == channel_id:
-        database.regist_personality(channel_id, discord_message.content)
+        database.regist_ai_personality(channel_id, discord_message.content)
         is_waiting_personality_text = False
         await discord_message.channel.send("人格を変更しました。")
         return
@@ -87,7 +91,11 @@ async def on_message(discord_message):
         return
     if discord_message.content == "!pause":
         is_pausing = True
-        await discord_message.channel.send("応答を停止します。")
+        await discord_message.channel.send("応答を一時停止します。")
+        return
+    if discord_message.content == "!clear":
+        database.delete_chat_history(channel_id)
+        await discord_message.channel.send("会話履歴を削除しました。")
         return
     await discord_message.channel.send(
         await exec_non_asyc_func(create_compilation, discord_message)

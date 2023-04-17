@@ -55,7 +55,7 @@ def regist_chat_history(
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO chat_history(channel_id, role, content) VALUES (%s, %s, %s), (%s, %s, %s)",
+                "INSERT INTO chat_histories (channel_id, role, content) VALUES (%s, %s, %s), (%s, %s, %s)",
                 (
                     channel_id,
                     "user",
@@ -72,7 +72,7 @@ def fetch_chat_history_top10(channel_id: str) -> List[Dict]:
     with get_connection() as conn:
         with conn.cursor(cursor_factory=DictCursor) as cur:
             cur.execute(
-                "SELECT role, content FROM chat_history WHERE channel_id = %s ORDER BY seq OFFSET 0 LIMIT 10",
+                "SELECT role, content FROM chat_histories WHERE channel_id = %s ORDER BY seq OFFSET 0 LIMIT 10",
                 (channel_id,),
             )
             result = cur.fetchall()
@@ -90,7 +90,7 @@ def delete_chat_history(channel_id: str):
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "DELETE FROM chat_history WHERE channel_id = %s",
+                "DELETE FROM chat_histories WHERE channel_id = %s",
                 (channel_id,),
             )
             conn.commit()
